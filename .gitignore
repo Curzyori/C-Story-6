@@ -1,0 +1,52 @@
+# --- Build Output ---
+dist/
+.astro/
+dist-ssr/
+
+# --- Dependencies ---
+node_modules/
+package-lock.json.local
+yarn.lock.local
+
+# --- Logs ---
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# --- Environment & Secrets ---
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*
+*.local
+auth.json
+
+# --- Databases ---
+*.db
+*.sqlite
+*.sqlite3
+dump.rdb
+
+# --- OS & Editor Junk ---
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# --- AI & System Scratch ---
+.gemini/
+brain/
+scratch/
+.system_generated/

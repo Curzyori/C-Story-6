@@ -1,0 +1,359 @@
+---
+export interface Props {
+  initialState?: {
+    sceneId: string;
+    security: number;
+    techDebt: number;
+    resources: number;
+  };
+  scenes: Record<string, {
+    text: string;
+    options: Array<{
+      text: string;
+      target: string;
+      impact?: { security?: number; techDebt?: number; resources?: number };
+    }>;
+  }>;
+}
+
+const { 
+  initialState = { sceneId: 'start', security: 50, techDebt: 20, resources: 100 },
+  scenes = {} 
+} = Astro.props;
+---
+
+<style is:global>
+  @keyframes pulse-intense {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(16,185,129,0.2); }
+    50% { transform: scale(1.05); box-shadow: 0 0 40px rgba(16,185,129,0.5); }
+  }
+  @keyframes text-glow-neon {
+    0%, 100% { text-shadow: 0 0 10px rgba(16,185,129,0.5), 0 0 20px rgba(16,185,129,0.3); }
+    50% { text-shadow: 0 0 20px rgba(16,185,129,0.8), 0 0 30px rgba(16,185,129,0.5); }
+  }
+  @keyframes s-rank-glow {
+    0%, 100% { filter: drop-shadow(0 0 10px rgba(16,185,129,0.4)) brightness(1); }
+    50% { filter: drop-shadow(0 0 30px rgba(16,185,129,0.8)) brightness(1.2); }
+  }
+  .animate-pulse-intense { animation: pulse-intense 2s infinite ease-in-out; }
+  .animate-text-glow-neon { animation: text-glow-neon 1.5s infinite ease-in-out; }
+  .animate-s-rank { animation: s-rank-glow 3s infinite ease-in-out; }
+</style>
+
+<div id="story-engine-root" class="w-full max-w-4xl mx-auto flex flex-col gap-8 relative font-sans">
+  
+  <!-- Final Evaluation Modal -->
+  <div id="evaluation-modal" class="fixed inset-0 z-[100] flex items-center justify-center hidden p-6">
+    <div class="absolute inset-0 bg-black/80 backdrop-blur-md"></div>
+    <div class="relative z-10 w-full max-w-lg p-10 bg-[#0c0c0c] border border-white/10 rounded-[2.5rem] shadow-2xl text-center overflow-hidden">
+      <div id="modal-rank-container" class="hidden mb-6">
+        <div class="inline-flex items-center justify-center w-24 h-24 rounded-full bg-neon-green/10 border-2 border-neon-green/30 animate-s-rank relative">
+          <span class="text-6xl font-black text-neon-green italic tracking-tighter">S</span>
+          <div class="absolute -bottom-2 px-3 py-1 bg-neon-green text-deep-dark text-[10px] font-bold rounded-full uppercase tracking-widest">Mastered</div>
+        </div>
+      </div>
+      <div id="modal-icon-container" class="w-20 h-20 mx-auto mb-6 rounded-full bg-white/5 flex items-center justify-center border border-white/10">
+        <svg class="w-10 h-10 text-neon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-7.618 3.072 11.952 11.952 0 00-4.42 7.209c0 6.627 5.373 12 12 12s12-5.373 12-12a11.952 11.952 0 00-4.42-7.209z"></path></svg>
+      </div>
+      <h2 id="modal-header" class="text-4xl font-black mb-4 uppercase tracking-tighter"></h2>
+      <p id="modal-message" class="text-gray-400 mb-10 leading-relaxed text-lg font-light"></p>
+      <div id="modal-actions" class="flex flex-col gap-4"></div>
+    </div>
+  </div>
+
+  <!-- Ambient Background Glow -->
+  <div class="absolute -top-10 -left-10 w-64 h-64 bg-neon-green/5 rounded-full blur-[100px] pointer-events-none"></div>
+
+  <!-- HUD (Heads-Up Display) -->
+  <div class="relative z-10 flex justify-between items-center p-5 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-xl shadow-lg">
+    
+    <div class="flex items-center gap-4 w-1/3">
+      <div class="h-10 w-1 bg-neon-green rounded-full shadow-[0_0_10px_rgba(16,185,129,0.8)]"></div>
+      <div class="flex flex-col">
+        <span class="text-[10px] font-bold uppercase tracking-widest text-gray-500">Security Level</span>
+        <div class="flex items-baseline gap-1">
+          <span id="hud-security" class="text-2xl font-black tracking-tight text-white">{initialState.security}</span>
+          <span class="text-sm text-neon-green">%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-4 border-l border-white/10 pl-6 w-1/3">
+      <div class="flex flex-col">
+        <span class="text-[10px] font-bold uppercase tracking-widest text-gray-500">Tech Debt</span>
+        <div class="flex items-baseline gap-1">
+          <span id="hud-techdebt" class="text-2xl font-black tracking-tight text-white">{initialState.techDebt}</span>
+          <span class="text-sm text-red-500">pts</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-6 border-l border-white/10 pl-6 w-1/3 justify-end text-right">
+      <div class="flex flex-col items-end">
+        <span class="text-[10px] font-bold uppercase tracking-widest text-gray-500">System Resources</span>
+        <div class="flex items-baseline gap-1">
+          <span id="hud-resources" class="text-2xl font-black tracking-tight text-white">{initialState.resources}</span>
+          <span class="text-sm text-blue-400">units</span>
+        </div>
+      </div>
+      <button id="reset-button" class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-red-500/20 border border-white/10 hover:border-red-500/50 transition-all group" title="Reset Campaign">
+        <span class="text-[10px] font-bold text-gray-500 group-hover:text-red-500 transition-colors uppercase tracking-widest">Reset</span>
+        <svg class="w-3.5 h-3.5 text-gray-500 group-hover:text-red-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Scene Container -->
+  <div class="relative z-10 p-8 md:p-12 bg-deep-dark/60 border border-white/10 rounded-3xl min-h-[400px] flex flex-col shadow-[0_20px_50px_rgba(0,0,0,0.5)] backdrop-blur-md">
+    
+    <!-- Scene Narrative -->
+    <div id="scene-text" class="text-lg md:text-xl text-gray-200 leading-relaxed mb-12 flex-grow transition-opacity duration-500 opacity-100 font-light tracking-wide">
+      <!-- Injected via JS -->
+    </div>
+
+    <!-- Choice Container -->
+    <div id="choice-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-auto">
+      <!-- Injected via JS -->
+    </div>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" is:inline></script>
+
+<script define:vars={{ scenes, initialState }}>
+  const SAVE_KEY = 'curzy_cstory_save';
+  
+  // Initialize state based on Astro props
+  let state = { ...initialState };
+
+  // Attempt to load from persistence
+  try {
+    const saved = localStorage.getItem(SAVE_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      // Ensure the saved sceneId exists in current scenes to avoid breakage on data updates
+      if (scenes[parsed.sceneId]) {
+        state = { ...state, ...parsed };
+      }
+    }
+  } catch (e) {
+    console.error("Corrupted save data found. Initializing fresh session.", e);
+  }
+
+  const root = document.getElementById('story-engine-root');
+  
+  if (root) {
+    const textEl = document.getElementById('scene-text');
+    const choiceContainer = document.getElementById('choice-container');
+    const hudSecurity = document.getElementById('hud-security');
+    const hudTechDebt = document.getElementById('hud-techdebt');
+    const hudResources = document.getElementById('hud-resources');
+    const resetBtn = document.getElementById('reset-button');
+    const modal = document.getElementById('evaluation-modal');
+    const modalHeader = document.getElementById('modal-header');
+    const modalMessage = document.getElementById('modal-message');
+    const modalActions = document.getElementById('modal-actions');
+    const modalRankContainer = document.getElementById('modal-rank-container');
+    const modalIconContainer = document.getElementById('modal-icon-container');
+
+    if (resetBtn) {
+      resetBtn.addEventListener('click', () => {
+        if (confirm("Are you sure you want to reset the campaign? All progress will be lost.")) {
+          localStorage.removeItem(SAVE_KEY);
+          window.location.reload();
+        }
+      });
+    }
+
+    function showEvaluationModal() {
+      modal.classList.remove('hidden');
+      modalActions.innerHTML = '';
+
+      if (state.security >= 100) {
+        modalRankContainer.classList.remove('hidden');
+        modalIconContainer.classList.add('hidden');
+
+        modalHeader.textContent = "[ STATUS: INVINCIBLE ]";
+        modalHeader.className = "text-4xl font-black mb-4 uppercase tracking-tighter text-neon-green animate-text-glow-neon";
+        modalMessage.textContent = "Incredible. You have maintained a perfect security protocol through all 10 chapters. Curzy Cloud is now officially INVINCIBLE. This level of technical discipline and foresight is unprecedented. Consider yourself a Master of the System. The ecosystem is fully optimized, and the future is yours to command. You have validated the Curzy Doctrine. Congratulations!";
+        
+        // Trigger Confetti
+        if (typeof confetti === 'function') {
+          const duration = 5 * 1000;
+          const animationEnd = Date.now() + duration;
+          const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 200, colors: ['#10b981', '#059669', '#34d399'] };
+
+          const randomInRange = (min, max) => Math.random() * (max - min) + min;
+
+          const interval = setInterval(function() {
+            const timeLeft = animationEnd - Date.now();
+            if (timeLeft <= 0) return clearInterval(interval);
+
+            const particleCount = 50 * (timeLeft / duration);
+            confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
+            confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
+          }, 250);
+        }
+
+        const btnExit = document.createElement('button');
+        btnExit.className = "w-full py-4 rounded-2xl bg-neon-green text-deep-dark font-bold hover:bg-emerald-400 transition-all shadow-[0_0_20px_rgba(16,185,129,0.2)] animate-pulse-intense";
+        btnExit.textContent = "Exit to Dashboard";
+        btnExit.onclick = () => window.location.href = '/';
+        
+        const btnShare = document.createElement('button');
+        btnShare.className = "w-full py-4 rounded-2xl bg-white/5 text-white/80 text-sm hover:bg-white/10 transition-all border border-white/5";
+        btnShare.textContent = "Share Achievement";
+        btnShare.onclick = () => alert("Curzy Cloud Security Certified: S-RANK.");
+
+        modalActions.appendChild(btnExit);
+        modalActions.appendChild(btnShare);
+      } else {
+        modalRankContainer.classList.add('hidden');
+        modalIconContainer.classList.remove('hidden');
+
+        modalHeader.textContent = "SYSTEM VULNERABLE";
+        modalHeader.className = "text-4xl font-black mb-4 uppercase tracking-tighter text-yellow-500";
+        modalMessage.textContent = `System stabilized at ${state.security}% security, but vulnerabilities remain in the architecture. A true SysAdmin aims for 100% perfection.`;
+        
+        const btnRestart = document.createElement('button');
+        btnRestart.className = "w-full py-4 rounded-2xl bg-white/5 border border-white/10 text-white font-bold hover:bg-white/10 transition-all";
+        btnRestart.textContent = "Restart Campaign";
+        btnRestart.onclick = () => {
+          localStorage.removeItem(SAVE_KEY);
+          window.location.reload();
+        };
+
+        const btnExit = document.createElement('button');
+        btnExit.className = "w-full py-2 text-white/20 text-xs hover:text-white/40 transition-all";
+        btnExit.textContent = "Exit Anyway";
+        btnExit.onclick = () => window.location.href = '/';
+
+        modalActions.appendChild(btnRestart);
+        modalActions.appendChild(btnExit);
+      }
+    }
+
+    function updateHUD() {
+      // Animate numbers (simple instantaneous update for robustness)
+      hudSecurity.textContent = state.security;
+      hudTechDebt.textContent = state.techDebt;
+      hudResources.textContent = state.resources;
+
+      // Color logic based on thresholds
+      hudSecurity.className = `text-2xl font-black tracking-tight ${state.security < 20 ? 'text-red-500' : 'text-white'}`;
+      hudTechDebt.className = `text-2xl font-black tracking-tight ${state.techDebt > 80 ? 'text-red-500' : 'text-white'}`;
+      hudResources.className = `text-2xl font-black tracking-tight ${state.resources < 20 ? 'text-yellow-500' : 'text-white'}`;
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+      } catch (e) {
+        console.error("Failed to save session state.", e);
+      }
+    }
+
+    function renderScene(sceneId) {
+      const scene = scenes[sceneId];
+      
+      // Trigger evaluation modal if at the grand finale
+      if (sceneId === 'ch10_start') {
+        showEvaluationModal();
+      }
+
+      if (!scene) {
+        textEl.innerHTML = `<span class="text-red-500 font-bold">CRITICAL ERROR: Scene parameters missing for ID '${sceneId}'. System Halt.</span>`;
+        choiceContainer.innerHTML = '';
+        return;
+      }
+
+      // Smooth narrative transition
+      textEl.style.opacity = 0;
+      
+      setTimeout(() => {
+        const isCriticalSecurity = state.security < 20;
+
+        // Dynamic Text Prefix
+        const prefix = isCriticalSecurity ? "[CRITICAL SYSTEM ALERT] " : "";
+        textEl.textContent = prefix + scene.text;
+        
+        // Dynamic UI Styling
+        if (isCriticalSecurity) {
+          textEl.classList.add('text-red-500', 'font-bold', 'animate-pulse');
+          textEl.classList.remove('text-gray-200', 'font-light');
+        } else {
+          textEl.classList.remove('text-red-500', 'font-bold', 'animate-pulse');
+          textEl.classList.add('text-gray-200', 'font-light');
+        }
+
+        textEl.style.opacity = 1;
+
+        // Clear and render new choices
+        choiceContainer.innerHTML = '';
+        
+        if (scene.options && scene.options.length > 0) {
+          scene.options.forEach(choice => {
+            const btn = document.createElement('button');
+            btn.className = `
+              relative overflow-hidden p-5 rounded-2xl border border-white/5 bg-white/5 
+              hover:bg-neon-green/10 hover:border-neon-green/40 hover:shadow-[0_0_20px_rgba(16,185,129,0.15)]
+              text-left transition-all duration-300 group flex flex-col justify-between items-start gap-2
+            `;
+            
+            // Build Impact Preview HTML
+            let impactHtml = '';
+            if (choice.impact) {
+              const impacts = [];
+              if (choice.impact.security) impacts.push(`<span class="${choice.impact.security > 0 ? 'text-neon-green' : 'text-red-500'}">SEC ${choice.impact.security > 0 ? '+' : ''}${choice.impact.security}</span>`);
+              if (choice.impact.techDebt) impacts.push(`<span class="${choice.impact.techDebt < 0 ? 'text-neon-green' : 'text-red-500'}">DEBT ${choice.impact.techDebt > 0 ? '+' : ''}${choice.impact.techDebt}</span>`);
+              if (choice.impact.resources) impacts.push(`<span class="${choice.impact.resources > 0 ? 'text-neon-green' : 'text-red-500'}">RES ${choice.impact.resources > 0 ? '+' : ''}${choice.impact.resources}</span>`);
+              
+              if (impacts.length > 0) {
+                impactHtml = `<div class="flex gap-3 text-[10px] font-bold uppercase tracking-wider opacity-60 group-hover:opacity-100 transition-opacity">${impacts.join('')}</div>`;
+              }
+            }
+
+            btn.innerHTML = `
+              <span class="text-sm md:text-base font-medium text-gray-300 group-hover:text-white transition-colors z-10">${choice.text}</span>
+              ${impactHtml}
+              <div class="absolute right-5 top-1/2 -translate-y-1/2 text-neon-green opacity-0 group-hover:opacity-100 group-hover:translate-x-2 transition-all duration-300 z-10">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </div>
+            `;
+            
+            btn.addEventListener('click', () => {
+              // Apply State Changes
+              if (choice.impact) {
+                state.security = Math.max(0, Math.min(100, state.security + (choice.impact.security || 0)));
+                state.techDebt = Math.max(0, state.techDebt + (choice.impact.techDebt || 0));
+                state.resources = Math.max(0, state.resources + (choice.impact.resources || 0));
+                updateHUD();
+              }
+              
+              // Move to next scene
+              state.sceneId = choice.target;
+              
+              // Reset state if restarting the campaign
+              if (state.sceneId === 'start') {
+                state = { ...initialState };
+                localStorage.removeItem(SAVE_KEY);
+                updateHUD();
+              } else {
+                saveState();
+              }
+
+              renderScene(state.sceneId);
+            });
+            
+            choiceContainer.appendChild(btn);
+          });
+        }
+      }, 300); // Wait for fade out
+    }
+
+    // Initial Render
+    updateHUD();
+    renderScene(state.sceneId);
+  }
+</script>

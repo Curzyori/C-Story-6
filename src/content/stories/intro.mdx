@@ -1,0 +1,19 @@
+---
+title: "The SysAdmin Protocol: Zero Day"
+author: "Curzy Ecosystem"
+description: "A 10-chapter interactive campaign handling critical system failures across the Curzy Cloud architecture."
+---
+
+import StoryEngine from '../../components/StoryEngine.astro';
+import { storyData } from '../../data/storyData';
+
+<div class="mb-8">
+  <h1 class="text-4xl font-extrabold text-white mb-2">{frontmatter.title}</h1>
+  <p class="text-gray-400">{frontmatter.description}</p>
+</div>
+
+{/* The StoryEngine component consumes the data imported from the data file */}
+<StoryEngine 
+  scenes={storyData} 
+  initialState={{ sceneId: 'start', security: 10, techDebt: 25, resources: 100 }} 
+/>

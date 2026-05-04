@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+@theme {
+  --color-deep-dark: #0a0a0a;
+  --color-neon-green: #10b981;
+}
+
+/* Custom base styles */
+@layer base {
+  body {
+    @apply bg-deep-dark text-white font-sans;
+  }
+}

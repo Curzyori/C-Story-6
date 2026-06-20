@@ -1,115 +1,75 @@
-# C-Story 📖
+<p align="center">
+  <img src="images/story.png" alt="Header Banner" width="100%"/>
+</p>
 
-> **Interactive Storyboard Engine | Curzy Ecosystem - Project #6**
-> **Version: 2.0.0 (The Masterpiece Update)**
+<h1 align="center">C Story</h1>
+<p align="center">
+  <strong>Interactive Storyboard Engine | Curzy Ecosystem</strong>
+</p>
 
-C-Story is a high-performance, interactive storytelling engine designed for immersive narrative experiences. Built with **Astro**, **TypeScript**, and **Tailwind CSS v4**, it follows the "Curzy Cloud" philosophy: Performance, Security, and Aesthetic Excellence.
+<p align="center">
+  <a href="https://c-story.curzy.dev"><strong>🌐 Live Demo Website</strong></a>
+</p>
 
----
+<div align="center">
 
-## 🖼️ Preview & UI Showcase
+[![Stars](https://img.shields.io/github/stars/Curzyori/c-story?style=for-the-badge&color=purple)](https://github.com/Curzyori/c-story/stargazers)
+[![Forks](https://img.shields.io/github/forks/Curzyori/c-story?style=for-the-badge&color=purple)](https://github.com/Curzyori/c-story/network/members)
+[![License](https://img.shields.io/badge/License-MIT-gold?style=for-the-badge)](LICENSE)
+[![Platform](https://img.shields.io/badge/Platform-Web-black?style=for-the-badge)](#)
 
-| Dashboard | Story Engine | Victory (S-RANK) |
-| :---: | :---: | :---: |
-| ![Dashboard](./images/dash.png) | ![Story Engine](./images/story.png) | ![Victory](./images/win.png) |
+</div>
 
----
-
-## 🚀 Core Features (v2.0.0)
-
-- **10-Chapter Saga**: Experience the full "Curzy Cloud Saga" from Zero Day to The Masterpiece.
-- **Session Persistence**: Progress is automatically saved to `localStorage`. Resume exactly where you left off.
-- **Dynamic Tone System**: The UI reacts to your system's state. Low security triggers critical alerts and visual glitches.
-- **Mastery Evaluation**: Reach the finale to receive a technical evaluation based on your security performance. Can you achieve the **S-RANK**?
-- **Glassmorphic HUD**: A high-tech, semi-transparent Heads-Up Display tracking Security, Tech Debt, and Resources in real-time.
-
----
-
-## 🛠️ Project Structure
-
-```text
-/ (Root)
-├── src/
-│   ├── components/      # Modular UI (StoryEngine, HUD, Modals)
-│   ├── content/         # MDX-based narrative campaign
-│   ├── data/            # Centralized Story Data (TypeScript)
-│   ├── layouts/         # Glassmorphic Main Layout
-│   └── pages/           # Application Routing
-├── images/              # Project Previews & Documentation Assets
-├── public/              # Static Assets & Icons
-├── astro.config.mjs     # Framework Orchestration
-└── tsconfig.json        # Strict TypeScript Configuration
-```
+<p align="center">
+  <a href="#-why-c-story">Why This</a> ·
+  <a href="#-key-features">Features</a> ·
+  <a href="#-quick-start">Quick Start</a>
+</p>
 
 ---
 
-## 💻 Getting Started
+## 🕒 Why C Story?
 
-### Prerequisites
-
-- **Node.js**: v18.0.0 or higher
-- **NPM**: v9.0.0 or higher
-
-### Installation
-
-1. **Clone the Repository**:
-   ```bash
-   git clone https://github.com/Curzyori/C-Story-6.git
-   cd C-Story-6
-   ```
-
-2. **Install Dependencies**:
-   ```bash
-   npm install
-   ```
-
-### Development
-
-1. **Start Development Server**:
-   ```bash
-   npm run dev
-   ```
-   *The engine will be live at `http://localhost:4321`*
-
-2. **Build for Production**:
-   ```bash
-   npm run build
-   ```
+An interactive storyboard engine designed to bring narratives to life. It serves as a visual and interactive layer within the Curzy Ecosystem, enabling dynamic storytelling with a modern tech stack.
 
 ---
 
-## 📤 Deployment & Git Workflow
+## 🎯 Key Features
 
-This project is optimized for deployment on Vercel, Netlify, or as a static site. To push your changes:
+- **Interactive Storyboarding**: Create and navigate through dynamic narrative flows
+- **Markdown-Powered**: Content driven by markdown with interactive components
+- **Modern Stack**: Built with Astro for performance and React for interactivity
+- **Ecosystem Integration**: Functions seamlessly as the 6th project in the Curzy Ecosystem
+
+---
+
+## 🛠 Tech Stack
+
+- **Framework**: Astro, React
+- **Styling**: Tailwind CSS v4
+- **Markdown**: MDX support for interactive content
+
+---
+
+## 🚀 Quick Start
+
+### Installation & Setup
 
 ```bash
-git add .
-git commit -m "feat: upgrade to v2.0.0 with 10-chapter campaign and persistence"
-git branch -M main
-git push -u origin main
+# Clone the repository
+git clone https://github.com/Curzyori/c-story.git
+cd c-story
+
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
 ```
-
----
-
-## 🎨 Design System
-
-C-Story adheres to the **Curzy "Deep Dark"** aesthetic:
-- **Core Background**: `#0a0a0a` (Deep Dark)
-- **Primary Accent**: `#10b981` (Neon Green)
-- **Warning State**: Red-shifting UI elements based on logic thresholds.
-- **Typography**: Inter / System Sans-Serif (High Readability).
-
----
-
-## 🔒 Security & Privacy
-
-- **Safe Configuration**: `.gitignore` is set to "Fortress" standards, protecting all `.env`, `.db`, and system logs.
-- **Zero-Data Leakage**: Local storage is used strictly for game session persistence.
 
 ---
 
 ## 📄 License
+This project is released under the **MIT License** — free for educational, personal, and research purposes.
 
-Licensed under the **MIT License**. Part of the Curzy Open Source Initiative.
-
-**Built by [Curzyori](https://github.com/Curzyori)**
+<sub>Built with passion as the 6th Project of the 50 Projects Challenge by **@curzyori**</sub>
